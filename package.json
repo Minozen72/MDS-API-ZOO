@@ -7,5 +7,9 @@
     "sequelize": "^6.37.5",
     "sqlite3": "^5.1.7",
     "telnet": "^0.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0"
   }
 }

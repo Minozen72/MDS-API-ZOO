@@ -2,12 +2,19 @@ const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, 'Suuuuuu');
-    const userId = decodedToken.userId;
-    req.userId = userId;
-    next();
+    const token = req.headers.token;
+    if (!token) {
+      return res.status(401).json({ error: 'Token manquant' });
+    }
+    try {
+      const decodedToken = jwt.verify(token, '1234567890');
+      const userId = decodedToken.userId;
+      req.userId = userId;
+      next();
+    } catch (error) {
+      res.status(401).json({ error: 'Token invalide' });
+    }
   } catch (error) {
     res.status(401).json({ error: 'Token invalide' });
   }
-}; 
+};
