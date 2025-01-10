@@ -113,7 +113,7 @@ exports.login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Identifiants invalides' });
     }
-    const token = jwt.sign({ userId: user.id_utilisateur }, secretKey, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id_utilisateur }, secretKey, { expiresIn: '8h' });
     res.json({ token });
   } catch (error) {
     console.error('Erreur lors de la connexion de l\'utilisateur:', error);

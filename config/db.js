@@ -16,5 +16,4 @@ sequelize.sync().then(() => {
     console.error('❌ Erreur lors de la synchronisation de la base de données :', err);
 });
 
-
 module.exports = sequelize;

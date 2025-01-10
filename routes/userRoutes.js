@@ -10,7 +10,7 @@ router.get('/', authMiddleware, userController.getAllUsers);
 router.get('/:id_utilisateur', authMiddleware, userController.getUser);
 
 // Route pour créer un utilisateur
-router.get('/login', userController.login);
+router.post('/login', userController.login);
 
 // Route pour créer un utilisateur
 router.post('/create', authMiddleware, userController.createUser);

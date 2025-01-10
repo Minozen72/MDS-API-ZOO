@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const Stock = require('./stockModel');
 
 const Product = sequelize.define('Product', {
   id_produit: {
@@ -8,7 +9,7 @@ const Product = sequelize.define('Product', {
     autoIncrement: true
   },
   nom: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(100),
     allowNull: false
   },
   description: {
@@ -20,32 +21,40 @@ const Product = sequelize.define('Product', {
     allowNull: false
   },
   taille: {
-    type: DataTypes.INTEGER,
-    allowNull: false
+    type: DataTypes.STRING(50),
+    allowNull: true
   },
   poids: {
-    type: DataTypes.DECIMAL(5, 2),
-    allowNull: false
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true
   },
   couleur: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: DataTypes.STRING(50),
+    allowNull: true
   },
-  materiau: {
-    type: DataTypes.STRING,
-    allowNull: false
+  matiere: {
+    type: DataTypes.STRING(50),
+    allowNull: true
   },
   id_stock: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: true,
+    references: {
+      model: 'Stock',
+      key: 'id_stock'
+    }
   },
   is_deleted: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
     defaultValue: false
   }
-  
+}, {
+  tableName: 'Produit',
+  schema: 'B2B',
+  timestamps: false
 });
 
+Product.belongsTo(Stock, { foreignKey: 'id_stock' });
 
 module.exports = Product;
