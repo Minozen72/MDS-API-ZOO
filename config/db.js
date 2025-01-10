@@ -1,9 +1,10 @@
 const { Sequelize } = require('sequelize');
+require('dotenv').config();
 
-const sequelize = new Sequelize('zoo', 'toto', 'toto', {
-  host: 'localhost',
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+  host: process.env.DB_HOST,
   dialect: 'mssql',
-  port:1433,
+  port: process.env.DB_PORT,
   dialectOptions: {
     encrypt: true,
     trustServerCertificate: true
