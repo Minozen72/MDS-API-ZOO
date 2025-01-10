@@ -9,9 +9,9 @@ services:
       - sqlserver
     environment:
       - DB_HOST=sqlserver
-      - DB_USER=sa
-      - DB_PASSWORD=yourStrongPassword!
-      - DB_NAME=YourDatabase
+      - DB_USER=toto
+      - DB_PASSWORD=toto
+      - DB_NAME=zoo
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -20,7 +20,7 @@ services:
       - "1433:1433"
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=yourStrongPassword!
+      - SA_PASSWORD=toto
     volumes:
       - sqlserverdata:/var/opt/mssql
 

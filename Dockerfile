@@ -2,7 +2,7 @@
 FROM node:18
 
 # Définir le répertoire de travail
-WORKDIR /usr/src/app
+WORKDIR /root/MDS-API-ZOO/TP/app
 
 # Copier les fichiers package.json et package-lock.json
 COPY package*.json ./
