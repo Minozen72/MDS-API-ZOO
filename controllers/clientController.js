@@ -1,5 +1,6 @@
 const Client = require('../models/clientModel');
 const User = require('../models/userModel');
+const io = require('socket.io');
 
 exports.getAllClients = async (req, res) => {
     console.log("getAllClients");

@@ -1,7 +1,5 @@
 const Product = require('../models/productModel');
-
-
-
+const io = require('socket.io');
 
 exports.getAllProducts = async (req, res) => {
     try {
@@ -29,6 +27,7 @@ exports.createProduct = async (req, res) => {
         const { nom, description, type, prix, taille, poids, couleur, matiere, id_stock } = req.body;
         console.log(nom, description, type, prix, taille, poids, couleur, matiere, id_stock);
         const product = await Product.create({ nom, description, type, prix : parseFloat(prix), taille, poids : parseFloat(poids) , couleur, matiere, id_stock: parseInt(id_stock) });
+        io.emit('productCreated', product);
         res.status(201).json(product);
     } catch (error) {
         console.error('Erreur lors de la création du produit:', error);
