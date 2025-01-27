@@ -7,6 +7,8 @@ const productRoutes = require('./routes/productRoutes');
 const stockRoutes = require('./routes/stockRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const clientRoutes = require('./routes/clientRoutes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 app.use(express.static('public'));
 
@@ -22,17 +24,52 @@ app.use('/api/services', serviceRoutes);
 
 app.use('/api/clients', clientRoutes);
 
+const port = process.env.PORT || 3000;
+
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'API Documentation',
+            version: '1.0.0',
+            description: 'API documentation with Swagger',
+        },
+        servers: [
+            {
+                url: `http://localhost:${port}`,
+            },
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
+        security: [
+            {
+                bearerAuth: [],
+            },
+        ],
+    },
+    apis: ['./routes/*.js', './controllers/*.js'], // ajustez ce chemin selon la structure de votre projet
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 const path = require('path');
 app.get('/test-socket', (req, res) => {
     res.sendFile(path.join(__dirname, 'sockets/index.html'));
 });
 const server = http.createServer(app);
 const io = socketIo(server);
-let nbUsers = 0;
 io.on('connection', (socket) => {
-    nbUsers++;
+
     console.log('Un utilisateur est connecté');
-    console.log('Nombre d\'utilisateurs connectés : ' + nbUsers);
     socket.on('chat message', (msg) => {
         io.emit('chat message', msg); // Envoyer le message à tous les utilisateurs
     });
@@ -42,7 +79,6 @@ io.on('connection', (socket) => {
     });
 });
 
-const port = process.env.PORT || 3000;
 server.listen(port, () => {
   console.log(`Serveur en écoute sur le port ${port}`);
 });
