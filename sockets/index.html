@@ -4,15 +4,69 @@
     <meta charset="UTF-8">
     <title>Chat Simple avec Socket.IO</title>
     <style>
-        #messages { height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 5px; }
-        form { display: flex; }
-        input[type="text"] { flex: 1; }
+        /* Styles pour la boîte de messages */
+        .chat-messages {
+            padding: 20px;
+            height: 400px;
+            overflow-y: scroll;
+            background: #f9f9f9; /* Couleur de fond plus douce */
+            border: 2px solid #007bff; /* Ajoute une bordure en haut pour séparer du formulaire */
+            border-radius: 5px;
+            scrollbar-width: thin;
+            scrollbar-color: #007bff #f9f9f9;
+            /* Pour les navigateurs Webkit (Chrome, Safari) */
+            .chat-messages::-webkit-scrollbar {
+                width: 12px;
+            }
+            .chat-messages::-webkit-scrollbar-track {
+                background: #f9f9f9;
+            }
+            .chat-messages::-webkit-scrollbar-thumb {
+                background-color: #007bff;
+                border-radius: 10px;
+                border: 3px solid #f9f9f9;
+            }
+        }
+
+        /* Styles pour le formulaire */
+        .chat-form {
+            display: flex;
+            padding: 10px;
+            background: #fff; /* Assure que le fond est blanc */
+            border-top: 1px solid #ccc; /* Ligne subtile pour séparer du contenu */
+        }
+
+        /* Styles pour l'input de texte */
+        .chat-form input[type="text"] {
+            flex: 1;
+            padding: 10px 15px;
+            margin-right: 10px;
+            border: 2px solid #007bff; /* Bordure bleue pour correspondre au thème */
+            border-radius: 20px; /* Bordures arrondies pour l'input */
+            outline: none; /* Supprime l'outline par défaut au focus */
+        }
+
+        /* Styles pour le bouton */
+        .chat-form button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px; /* Bordures arrondies pour le bouton */
+            background: #007bff; /* Couleur de fond bleue */
+            color: white;
+            font-size: 16px; /* Taille de police légèrement plus grande */
+            cursor: pointer;
+            transition: background-color 0.3s; /* Transition pour l'effet de survol */
+        }
+
+        .chat-form button:hover {
+            background: #0056b3; /* Couleur plus foncée au survol */
+        }
     </style>
 </head>
 <body>
     <h1>Chat Simple avec Socket.IO</h1>
-    <div id="messages"></div>
-    <form id="message-form">
+    <div id="messages" class="chat-messages"></div>
+    <form id="message-form" class="chat-form">
         <input type="text" id="message-input" placeholder="Écrivez un message...">
         <button type="submit">Envoyer</button>
     </form>
