@@ -1,5 +1,4 @@
 const Product = require('../models/productModel');
-const io = require('socket.io');
 
 exports.getAllProducts = async (req, res) => {
     try {

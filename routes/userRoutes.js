@@ -58,6 +58,24 @@ router.get('/', authMiddleware, userController.getAllUsers);
 
 /**
  * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     tags: [Users]
+ *     summary: Get a user by ID
+ *     description: Get a user by their unique identifier.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ */
+router.get('/:id', authMiddleware, userController.getUserById);
+
+/**
+ * @swagger
  * /api/users/create:
  *   post:
  *     tags: [Users]
@@ -117,7 +135,7 @@ router.put('/update', authMiddleware, userController.updateUser);
  *       200:
  *         description: User deleted successfully.
  */
-router.delete('/delete', authMiddleware, userController.deleteUser);
+router.delete('/delete/:id', authMiddleware, userController.deleteUser);
 
 module.exports = router;
 

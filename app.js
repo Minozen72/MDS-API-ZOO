@@ -14,15 +14,15 @@ app.use(express.static('public'));
 
 app.use(express.json());
 
-app.use('/api/users', userRoutes);
+app.use('/v0/users', userRoutes);
 
-app.use('/api/products', productRoutes);
+app.use('/v0/products', productRoutes);
 
-app.use('/api/stocks', stockRoutes);
+app.use('/v0/stocks', stockRoutes);
 
-app.use('/api/services', serviceRoutes);
+app.use('/v0/services', serviceRoutes);
 
-app.use('/api/clients', clientRoutes);
+app.use('/v0/clients', clientRoutes);
 
 const port = process.env.PORT || 3000;
 
@@ -67,17 +67,22 @@ app.get('/test-socket', (req, res) => {
 });
 const server = http.createServer(app);
 const io = socketIo(server);
-io.on('connection', (socket) => {
+  io.on("connection", (socket) => {
+    console.log("A user connected");
 
-    console.log('Un utilisateur est connecté');
-    socket.on('chat message', (msg) => {
-        io.emit('chat message', msg); // Envoyer le message à tous les utilisateurs
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
     });
 
-    socket.on('disconnect', () => {
-        console.log('Un utilisateur s\'est déconnecté');
+    socket.on("message", (msg) => {
+      console.log("Message received: " + JSON.stringify(msg));
+      io.emit("message", {
+        message: msg.message,
+        senderId: msg.senderId,
+        username: msg.username,
+      });
     });
-});
+  });
 
 server.listen(port, () => {
   console.log(`Serveur en écoute sur le port ${port}`);

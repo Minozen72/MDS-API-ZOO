@@ -1,34 +1,37 @@
-module.exports = {
-  root: true,
-  env: {
-      browser: true,
-      es2021: true,
-      node: true,
-  },
-  ignorePatterns: ["node_modules"],
-  extends: ["eslint:recommended", "airbnb", "plugin:prettier/recommended"],
-  plugins: ["@stylistic"],
-  rules: {
-      // Classic rules
-      "no-console": ["warn", { allow: ["error"] }],
+import js from '@eslint/js';
+import prettier from 'eslint-config-prettier';
 
-      // Prettier rules
-      "prettier/prettier": [
-      "error",
-      {
-          printWidth: 80,
-          tabWidth: 2,
-          useTabs: false,
-          semi: true,
-          singleQuote: false,
-          quoteProps: "consistent",
-          trailingComma: "all",
-          bracketSpacing: true,
-          bracketSameLine: false,
-          arrowParens: "always",
-          endOfLine: "auto",
-          singleAttributePerLine: true,
-      },
-      ],
-  },
-};
+export default [
+    js.configs.recommended,
+    prettier,
+    {
+        files: ['**/*.js'],
+        languageOptions: {
+            ecmaVersion: 'latest',
+            sourceType: 'module',
+            globals: {
+                window: 'readonly',
+                document: 'readonly',
+                console: 'readonly',
+                io: 'readonly',
+                process: 'readonly',
+                module: 'readonly',
+                require: 'readonly',
+                exports: 'writable',
+                __dirname: 'readonly',
+                __filename: 'readonly'
+            }
+        },
+        rules: {
+            'no-unused-vars': ['warn', { 
+                "vars": "all",
+                "args": "none",
+                "ignoreRestSiblings": false,
+                "varsIgnorePattern": "^_",
+                "argsIgnorePattern": "^_"
+            }],
+            'no-console': 'off',
+            'no-undef': 'error'
+        }
+    },
+];

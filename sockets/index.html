@@ -1,98 +1,358 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Chat Simple avec Socket.IO</title>
+    <title>Modern Chat</title>
+    <script src="/socket.io/socket.io.js"></script>
     <style>
-        /* Styles pour la boîte de messages */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fff5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #1c1e21;
+        }
+
+        .chat-container {
+            width: 360px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #dc3545;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            text-align: center;
+            font-weight: bold;
+        }
+
         .chat-messages {
             padding: 20px;
-            height: 400px;
-            overflow-y: scroll;
-            background: #f9f9f9; /* Couleur de fond plus douce */
-            border: 2px solid #007bff; /* Ajoute une bordure en haut pour séparer du formulaire */
-            border-radius: 5px;
-            scrollbar-width: thin;
-            scrollbar-color: #007bff #f9f9f9;
-            /* Pour les navigateurs Webkit (Chrome, Safari) */
-            .chat-messages::-webkit-scrollbar {
-                width: 12px;
-            }
-            .chat-messages::-webkit-scrollbar-track {
-                background: #f9f9f9;
-            }
-            .chat-messages::-webkit-scrollbar-thumb {
-                background-color: #007bff;
-                border-radius: 10px;
-                border: 3px solid #f9f9f9;
-            }
+            overflow-y: auto;
+            flex-grow: 1;
+            background: #fff5f5;
         }
 
-        /* Styles pour le formulaire */
-        .chat-form {
-            display: flex;
-            padding: 10px;
-            background: #fff; /* Assure que le fond est blanc */
-            border-top: 1px solid #ccc; /* Ligne subtile pour séparer du contenu */
-        }
-
-        /* Styles pour l'input de texte */
-        .chat-form input[type="text"] {
-            flex: 1;
+        .message-bubble {
             padding: 10px 15px;
-            margin-right: 10px;
-            border: 2px solid #007bff; /* Bordure bleue pour correspondre au thème */
-            border-radius: 20px; /* Bordures arrondies pour l'input */
-            outline: none; /* Supprime l'outline par défaut au focus */
+            border-radius: 18px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            max-width: 80%;
         }
 
-        /* Styles pour le bouton */
-        .chat-form button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px; /* Bordures arrondies pour le bouton */
-            background: #007bff; /* Couleur de fond bleue */
+        .message-sent {
+            background: #dc3545;
             color: white;
-            font-size: 16px; /* Taille de police légèrement plus grande */
-            cursor: pointer;
-            transition: background-color 0.3s; /* Transition pour l'effet de survol */
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
         }
 
-        .chat-form button:hover {
-            background: #0056b3; /* Couleur plus foncée au survol */
+        .message-received {
+            background: #f0f0f0;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .chat-input {
+            padding: 15px;
+            background: #fff;
+            border-top: 1px solid #ccc;
+            display: flex;
+            gap: 10px;
+        }
+
+        #messageInput, #usernameInput {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        #messageInput:focus, #usernameInput:focus {
+            border-color: #dc3545;
+        }
+
+        #sendButton, #usernameButton {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #sendButton:hover, #usernameButton:hover {
+            background: #c82333;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background: #31a24c;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .typing-indicator {
+            padding: 8px 16px;
+            color: #65676b;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .username-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .username-container {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .username-container h2 {
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+
+        .chat-section {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .message-sender {
+            font-size: 0.8rem;
+            color: #65676b;
+            margin-bottom: 4px;
+            margin-left: 16px;
+            font-weight: 500;
+        }
+
+        .message-item {
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
 <body>
-    <h1>Chat Simple avec Socket.IO</h1>
-    <div id="messages" class="chat-messages"></div>
-    <form id="message-form" class="chat-form">
-        <input type="text" id="message-input" placeholder="Écrivez un message...">
-        <button type="submit">Envoyer</button>
-    </form>
+<div id="usernameSection" class="username-section">
+    <div class="username-container">
+        <h2>Enter your username</h2>
+        <input type="text" id="usernameInput" placeholder="Username...">
+        <button id="usernameButton">Join Chat</button>
+    </div>
+</div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
+<div id="chatSection" class="chat-container chat-section">
+    <div class="chat-header">
+        <div class="status-indicator"></div>
+        <h1>Chat Room</h1>
+    </div>
+    <div class="chat-messages">
+        <ul id="messages" class="message-list"></ul>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Type a message...">
+        <button id="sendButton">Send</button>
+    </div>
+</div>
+
+<script>
+    function machine(chiffre) {
+        const devises = [500, 200, 100, 50, 20, 10, 5];
+        const pieces = [2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01];
+        const result = [];
+        let reste = chiffre;
+
+        for (const devise of devises) {
+            const nbBillets = Math.trunc(reste / devise);
+            reste = Number((reste - nbBillets * devise).toFixed(2));
+            if (nbBillets > 0) {
+                result.push({ type: 'billet', valeur: devise, quantite: nbBillets });
+            }
+        }
+
+        for (const piece of pieces) {
+            const nbPieces = Math.trunc(reste / piece);
+            reste = Number((reste - nbPieces * piece).toFixed(2));
+            if (nbPieces > 0) {
+                result.push({ type: 'piece', valeur: piece, quantite: nbPieces });
+            }
+        }
+
+        return {
+            reste,
+            distribution: result
+        };
+    }
+
+    function affichageResultat(resultat) {
+        return resultat.map(item => `${item.quantite} x ${item.valeur}`).join(', ');
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
         const socket = io();
+        const messagesList = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const usernameInput = document.getElementById('usernameInput');
+        const chatSection = document.getElementById('chatSection');
+        const usernameSection = document.getElementById('usernameSection');
+        let isTyping = false;
+        let mySocketId;
+        let username = '';
 
-        // Écouter les messages entrants
-        socket.on('chat message', function(msg) {
-            const item = document.createElement('div');
-            item.textContent = msg;
-            document.getElementById('messages').appendChild(item);
-            window.scrollTo(0, document.body.scrollHeight);
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            mySocketId = socket.id;
+            addSystemMessage('Connected to chat');
         });
 
-        // Envoyer des messages au serveur
-        const form = document.getElementById('message-form');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const input = document.getElementById('message-input');
-            if (input.value) {
-                socket.emit('chat message', input.value);
-                input.value = '';
+        socket.on('message', (data) => {
+            if (data.senderId !== mySocketId) {
+                addMessage(data.message, false, data.username);
             }
         });
-    </script>
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+            addSystemMessage('Disconnected from chat');
+        });
+
+        function addMessage(text, isSent, sender) {
+            const messageItem = document.createElement('li');
+            messageItem.className = 'message-item';
+
+            if (!isSent && sender) {
+                const senderName = document.createElement('div');
+                senderName.textContent = sender;
+                senderName.className = 'message-sender';
+                messageItem.appendChild(senderName);
+            }
+
+            const messageContent = document.createElement('div');
+            messageContent.textContent = text;
+            messageContent.className = `message-bubble ${isSent ? 'message-sent' : 'message-received'}`;
+            messageItem.appendChild(messageContent);
+
+            messagesList.appendChild(messageItem);
+            scrollToBottom();
+        }
+
+        function addSystemMessage(text) {
+            const messageItem = document.createElement('li');
+            messageItem.textContent = text;
+            messageItem.style.textAlign = 'center';
+            messageItem.style.color = '#65676b';
+            messageItem.style.fontSize = '0.9rem';
+            messageItem.style.padding = '8px 0';
+            messagesList.appendChild(messageItem);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const chatMessages = document.querySelector('.chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function setUsername() {
+            username = usernameInput.value.trim();
+            if (username) {
+                usernameSection.style.display = 'none';
+                chatSection.style.display = 'flex';
+                addSystemMessage(`Welcome, ${username}!`);
+                messageInput.focus();
+            }
+        }
+
+        document.getElementById('usernameButton').addEventListener('click', setUsername);
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                setUsername();
+            }
+        });
+
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                if (message.startsWith('/dab')) {
+                    const parts = message.split(' ');
+
+                    const amount = parseFloat(parts[1]);
+                    if (isNaN(amount)) {
+                        addMessage('Error: Invalid amount. Please enter a valid number.', true);
+                        return;
+                    }
+
+                    const result = machine(amount);
+                    addMessage(`Result: ${affichageResultat(result.distribution)}`, true);
+                } else {
+                    socket.emit('message', {
+                        message: message,
+                        senderId: mySocketId,
+                        username: username
+                    });
+                    addMessage(message, true);
+                }
+                messageInput.value = '';
+            }
+        }
+
+        messageInput.addEventListener('input', () => {
+            if (!isTyping && messageInput.value) {
+                isTyping = true;
+                socket.emit('typing', true);
+            } else if (isTyping && !messageInput.value) {
+                isTyping = false;
+                socket.emit('typing', false);
+            }
+        });
+    });
+</script>
 </body>
 </html>

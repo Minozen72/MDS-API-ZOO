@@ -1,7 +1,6 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const io = require('socket.io');
 
 const secretKey = '1234567890';
 
@@ -85,11 +84,12 @@ exports.updateUser = async (req, res) => {
 
 // Supprimer un utilisateur
 exports.deleteUser = async (req, res) => {
+  console.log("deleteUser");
   try {
-    const { id_utilisateur } = req.query;
-    console.log("id_utilisateur : ", id_utilisateur);
+    const { id } = req.params;
+    console.log("id : ", id);
     const deleted = await User.destroy({
-      where: { id_utilisateur: id_utilisateur }
+      where: { id_utilisateur: id }
     });
     if (deleted) {
       res.status(204).json();
