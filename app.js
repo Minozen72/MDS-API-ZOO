@@ -54,12 +54,12 @@ const swaggerOptions = {
             },
         ],
     },
-    apis: ['./routes/*.js', './controllers/*.js'], // ajustez ce chemin selon la structure de votre projet
+    apis: ['./routes/*.js', './controllers/*.js'], 
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/v0/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const path = require('path');
 app.get('/test-socket', (req, res) => {

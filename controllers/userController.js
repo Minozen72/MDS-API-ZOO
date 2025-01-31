@@ -14,6 +14,8 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+
+// Récupérer un utilisateurs
 exports.getUser = async (req, res) => {
   try {
     const { id_utilisateur } = req.params;
@@ -97,7 +99,7 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-
+// Login et création du token JWT
 exports.login = async (req, res) => {
   try {
     const { login, password } = req.body;
