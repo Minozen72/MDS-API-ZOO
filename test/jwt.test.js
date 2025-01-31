@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const jwt = require('jsonwebtoken');
-const app = require('../app'); // Assure-toi que le chemin correspond à ton fichier principal
+const app = require('../app'); 
 const expect = chai.expect;
 const mocha = require('mocha');
 const describe = mocha.describe;
@@ -23,10 +23,10 @@ describe('JWT Middleware Tests', () => {
 
     it('should allow access with a valid token', async () => {
         const res = await chai.request(app)
-            .get('/v0/users') // Remplace par une route protégée
+            .get('/v0/users') 
             .set('Authorization', `Bearer ${validToken}`);
 
-        expect(res).to.have.status(200); // Adapte en fonction de la réponse attendue
+        expect(res).to.have.status(200);
     });
 
     it('should deny access with an invalid token', async () => {
