@@ -1,5 +1,4 @@
 const User = require('../models/userModel');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const secretKey = '1234567890';
@@ -63,10 +62,6 @@ exports.updateUser = async (req, res) => {
   try {
 
     const { id_utilisateur, login, mdp, role } = req.body;
-    console.log("id_utilisateur : ", id_utilisateur);
-    console.log("login : ", login);
-    console.log("mdp : ", mdp);
-    console.log("role : ", role);
     const [updated] = await User.update({ login, mdp, role }, {
       where: { id_utilisateur: id_utilisateur }
     });
@@ -110,8 +105,7 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: 'Identifiants invalides' });
     }
-    const isPasswordValid = bcrypt.compare(password, user.mdp);
-    if (!isPasswordValid) {
+    if (password !== user.mdp) {
       return res.status(401).json({ error: 'Identifiants invalides' });
     }
     const token = jwt.sign({ userId: user.id_utilisateur }, secretKey, { expiresIn: '8h' });

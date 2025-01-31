@@ -84,8 +84,14 @@ const io = socketIo(server);
     });
   });
 
-server.listen(port, () => {
-  console.log(`Serveur en écoute sur le port ${port}`);
-});
+// Au lieu de app.listen directement ici, exportez l'app
+module.exports = app;
+
+// Démarrez le serveur uniquement si ce n'est pas un test
+if (process.env.NODE_ENV !== 'test') {
+    server.listen(port, () => {
+        console.log(`Serveur en écoute sur le port ${port}`);
+    });
+}
 
 
